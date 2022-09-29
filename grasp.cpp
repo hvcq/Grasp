@@ -89,7 +89,7 @@ int columna_a_asignar(float nivel_de_determinismo, int size_vector_columnas){
 string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, vector<columna> vec_columnas, vector<int> & vec_t_strings,float nivel_de_determinismo){
     string S = setup_S(m);
     int threshold = m*th;
-    int posicion_columna_a_asginar;
+    int posicion_columna_a_asignar;
     int caracter_a_asignar = 0;
     string S_aux;
     vector<char> posibilidades {'A','G','C','T'};
@@ -107,13 +107,13 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
     */
     while(vec_columnas.size() > (m - threshold + 1)){
         S_aux = S;
-        posicion_columna_a_asginar = columna_a_asignar(nivel_de_determinismo, vec_columnas.size());
+        posicion_columna_a_asignar = columna_a_asignar(nivel_de_determinismo, vec_columnas.size());
         if(!eleccion_determinista){
             for(int j = 0; j < 4; ++j){
                 cantidad_mayores_t_aux = 0;
-                S_aux.at(vec_columnas.at(posicion_columna_a_asginar).posicion) = posibilidades.at(j);
+                S_aux.at(vec_columnas.at(posicion_columna_a_asignar).posicion) = posibilidades.at(j);
                 for(int k = 0; k < n; ++k){
-                    if(caracteres_son_distintos(S_aux.at(vec_columnas.at(posicion_columna_a_asginar).posicion),vec_strings.at(k).at(vec_columnas.at(posicion_columna_a_asginar).posicion)))
+                    if(caracteres_son_distintos(S_aux.at(vec_columnas.at(posicion_columna_a_asignar).posicion),vec_strings.at(k).at(vec_columnas.at(posicion_columna_a_asignar).posicion)))
                         ++vec_t_strings_aux.at(k);
                     if(vec_t_strings_aux.at(k) > mayor_t_actual)
                         ++cantidad_mayores_t_aux;
@@ -124,16 +124,16 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
                 }
                 vec_t_strings_aux.clear();
                 vec_t_strings_aux = vec_t_strings;
-                S_aux.at(vec_columnas.at(posicion_columna_a_asginar).posicion) = 'X';
+                S_aux.at(vec_columnas.at(posicion_columna_a_asignar).posicion) = 'X';
             }
         }
         if(eleccion_determinista){
             cantidad_mayores_t_aux = 0;
-            S.at(vec_columnas.at(posicion_columna_a_asginar).posicion) = vec_columnas.at(posicion_columna_a_asginar).caracter_menos_frecuente;
+            S.at(vec_columnas.at(posicion_columna_a_asignar).posicion) = vec_columnas.at(posicion_columna_a_asignar).caracter_menos_frecuente;
         }else
-            S.at(vec_columnas.at(posicion_columna_a_asginar).posicion) = posibilidades.at(caracter_a_asignar);
+            S.at(vec_columnas.at(posicion_columna_a_asignar).posicion) = posibilidades.at(caracter_a_asignar);
         for(int i = 0; i < n; ++i){
-            if(caracteres_son_distintos(S.at(vec_columnas.at(posicion_columna_a_asginar).posicion),vec_strings.at(i).at(vec_columnas.at(posicion_columna_a_asginar).posicion)))
+            if(caracteres_son_distintos(S.at(vec_columnas.at(posicion_columna_a_asignar).posicion),vec_strings.at(i).at(vec_columnas.at(posicion_columna_a_asignar).posicion)))
                 ++vec_t_strings_aux.at(i);
             if(eleccion_determinista){
                 if(vec_t_strings_aux.at(i) > mayor_t_actual)
@@ -150,7 +150,7 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
         for(int i = 0; i < n; ++i)
             if(vec_t_strings.at(i) > mayor_t_actual)
                 mayor_t_actual = vec_t_strings.at(i);
-        vec_columnas.erase(vec_columnas.begin()+posicion_columna_a_asginar);
+        vec_columnas.erase(vec_columnas.begin()+posicion_columna_a_asignar);
     }
     
     int mayor_cardinalidad = -1;
@@ -162,13 +162,13 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
     */
     while ((!vec_columnas.empty())&&(mayor_cardinalidad < n)){
         S_aux = S;
-        posicion_columna_a_asginar = columna_a_asignar(nivel_de_determinismo, vec_columnas.size());
+        posicion_columna_a_asignar = columna_a_asignar(nivel_de_determinismo, vec_columnas.size());
         if(!eleccion_determinista){
             for(int j = 0; j < 4; ++j){
                 cardinalidad_aux = 0;
-                S_aux.at(vec_columnas.at(posicion_columna_a_asginar).posicion) = posibilidades.at(j);
+                S_aux.at(vec_columnas.at(posicion_columna_a_asignar).posicion) = posibilidades.at(j);
                 for(int k = 0; k < n; ++k){
-                    if(caracteres_son_distintos(S_aux.at(vec_columnas.at(posicion_columna_a_asginar).posicion),vec_strings.at(k).at(vec_columnas.at(posicion_columna_a_asginar).posicion)))
+                    if(caracteres_son_distintos(S_aux.at(vec_columnas.at(posicion_columna_a_asignar).posicion),vec_strings.at(k).at(vec_columnas.at(posicion_columna_a_asignar).posicion)))
                         ++vec_t_strings_aux.at(k);
                     if(vec_t_strings_aux.at(k) >= threshold)
                         ++cardinalidad_aux;
@@ -179,16 +179,16 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
                 }
                 vec_t_strings_aux.clear();
                 vec_t_strings_aux = vec_t_strings;
-                S_aux.at(vec_columnas.at(posicion_columna_a_asginar).posicion) = 'X';
+                S_aux.at(vec_columnas.at(posicion_columna_a_asignar).posicion) = 'X';
             }
         }
         if(eleccion_determinista){
             cardinalidad_aux = 0;
-            S.at(vec_columnas.at(posicion_columna_a_asginar).posicion) = vec_columnas.at(posicion_columna_a_asginar).caracter_menos_frecuente;
+            S.at(vec_columnas.at(posicion_columna_a_asignar).posicion) = vec_columnas.at(posicion_columna_a_asignar).caracter_menos_frecuente;
         }else
-            S.at(vec_columnas.at(posicion_columna_a_asginar).posicion) = posibilidades.at(caracter_a_asignar);
+            S.at(vec_columnas.at(posicion_columna_a_asignar).posicion) = posibilidades.at(caracter_a_asignar);
         for(int i = 0; i < n; ++i){
-            if(caracteres_son_distintos(S.at(vec_columnas.at(posicion_columna_a_asginar).posicion),vec_strings.at(i).at(vec_columnas.at(posicion_columna_a_asginar).posicion)))
+            if(caracteres_son_distintos(S.at(vec_columnas.at(posicion_columna_a_asignar).posicion),vec_strings.at(i).at(vec_columnas.at(posicion_columna_a_asignar).posicion)))
                 ++vec_t_strings_aux.at(i);
             if(eleccion_determinista){
                 if(vec_t_strings_aux.at(i) >= threshold)
@@ -201,7 +201,7 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
             }
         }
         vec_t_strings = vec_t_strings_aux;
-        vec_columnas.erase(vec_columnas.begin()+posicion_columna_a_asginar);
+        vec_columnas.erase(vec_columnas.begin()+posicion_columna_a_asignar);
     }
 
     /*Si con thershold caracteres ya se abarca todo el conjunto omega, se rellena con 'A' las columnas sobrantes*/
