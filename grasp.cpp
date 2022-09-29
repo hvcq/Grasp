@@ -152,7 +152,6 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
                 mayor_t_actual = vec_t_strings.at(i);
         vec_columnas.erase(vec_columnas.begin()+posicion_columna_a_asignar);
     }
-    
     int mayor_cardinalidad = -1;
     int cardinalidad_aux;
     
@@ -216,11 +215,39 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
     tiempos_txt<<"Tiempo de respuesta: "<<time<<" [seconds]"<<endl;*/
 }
 
-void LocalSearch(){
+/*Utilizar un parámetro con el porcentaje de peores columnas de vec_columnas
+las cuales seran el vecindario h realizar cambios en ellos*/
 
+//MAYOR_CARDINALIDAD_ITERACION es global por lo que tenemos la cardinalidad que se tenia de greedy aleatorizado
+string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_strings, vector<columna> vec_columnas, vector<int> vec_t_string, float porcentaje_vecindario){
+    int size_vecindario =  m*porcentaje_vecindario;
+    vector<int> vec_t_string_aux = vec_t_string;
+    vector<char> posibilidades {'A','G','C','T'};
+    int mayor_cardinalidad = -1;
+    int cardinalidad_aux;
+    int caracter_a_asignar = 0;
+    for(int i = m - 1; i >= m - size_vecindario; --i){
+        cardinalidad_aux = 0;
+        for(int j = 0; j < 4; ++j){
+            for(int k = 0; k < n; ++k){
+                if(caracteres_son_distintos(posibilidades.at(j), vec_strings.at(k).at(vec_columnas.at(i).posicion))){
+                    ++vec_t_string_aux.at(k);
+                }
+                if(vec_t_string_aux.at(k) >= threshold){
+                    ++cardinalidad_aux;
+                }
+            }
+            if(cardinalidad_aux > mayor_cardinalidad){
+                mayor_cardinalidad = cardinalidad_aux;
+                caracter_a_asignar = j;
+            }
+            vec_t_string_aux.clear();
+        }
+    }
+    
 }
 
-void GRASP(vector<string> & vec_strings, int t, float th, float nivel_de_determinismo){
+void GRASP(vector<string> & vec_strings, int t, float th, float nivel_de_determinismo, float porcentaje_vecindario){
     int n = vec_strings.size();
     int m = vec_strings.at(0).size();
     vector<columna> vec_columnas;
@@ -235,6 +262,7 @@ void GRASP(vector<string> & vec_strings, int t, float th, float nivel_de_determi
     vector<int> vec_t_strings(n);
 
     string S;
+    string new_S;
     double time = 0;
     unsigned t0, t1;
     int iteracion = 0;
@@ -244,6 +272,7 @@ void GRASP(vector<string> & vec_strings, int t, float th, float nivel_de_determi
         //Aqui comienza a medir el tiempo
         t0 = clock();
         S = greedy_aleatorizado(n, m, th, vec_strings, vec_columnas, vec_t_strings, nivel_de_determinismo);
+        new_S = LocalSearch(n, m, th*m , S, vec_strings, vec_columnas, vec_t_strings, porcentaje_vecindario);
         if(MAYOR_CARDINALIDAD_ITERACION > MAYOR_CARDINALIDAD_GLOBAL){
             MAYOR_CARDINALIDAD_GLOBAL = MAYOR_CARDINALIDAD_ITERACION;
             MEJOR_S = S;
@@ -252,10 +281,10 @@ void GRASP(vector<string> & vec_strings, int t, float th, float nivel_de_determi
         t1 = clock();
         time += (double(t1-t0)/CLOCKS_PER_SEC);
     
-        cout<<"Resultado iteracion "<<iteracion<<endl;
+        //cout<<"Resultado iteracion "<<iteracion<<endl;
         //cout<<"S: "<<S<<endl;
-        cout<<"Cardinalidad de P^S: "<<MAYOR_CARDINALIDAD_ITERACION<<endl;
-        cout<<"Tiempo de respuesta: "<<time<<" [seconds]"<<endl<<endl;
+        //cout<<"Cardinalidad de P^S: "<<MAYOR_CARDINALIDAD_ITERACION<<endl;
+        //cout<<"Tiempo de respuesta: "<<time<<" [seconds]"<<endl<<endl;
         ++iteracion;
     }  
     cout<<"_________________________"<<endl;
@@ -268,12 +297,12 @@ void GRASP(vector<string> & vec_strings, int t, float th, float nivel_de_determi
 int main(int argc, char *argv[]){
     vector<string> vec_strings;
     srand(time(NULL));
-    if(argc < 9){
+    if(argc < 11){
         cout<<endl<<"ERROR: No se encuentran todos los argumentos necesarios"<<endl;
         throw;
     }
     parsear_entrada(argv[2], vec_strings);
-    GRASP(vec_strings,stoi(argv[4]),stof(argv[6]),stof(argv[8]));
+    GRASP(vec_strings,stoi(argv[4]),stof(argv[6]),stof(argv[8]),stof(argv[10]));
     /*tiempos_txt.open("resultados_GP_0.85.txt");
     string archivo;
     for(int i = 1; i <= 10; ++i){
