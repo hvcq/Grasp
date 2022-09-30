@@ -7,6 +7,7 @@ using namespace std;
 bool eleccion_determinista;
 int MAYOR_CARDINALIDAD_ITERACION;
 int MAYOR_CARDINALIDAD_GLOBAL;
+int borrar;
 string MEJOR_S;
 
 typedef struct{
