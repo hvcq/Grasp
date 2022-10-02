@@ -296,8 +296,6 @@ string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_stri
             vec_t_strings = vec_t_strings_aux;
             encontre_mejor_cardinalidad = false;
             S = mejor_S_aux;
-            encontre_mejor_cardinalidad = false;
-            S = mejor_S_aux;
         }
     }
     return mejor_S_aux;
