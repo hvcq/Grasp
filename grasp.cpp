@@ -348,7 +348,7 @@ void GRASP(string dir, vector<string> & vec_strings, int t, float th, float nive
             cout<<"Iteración: "<<iteracion<<"\nCardinalidad Greedy_a: "<<temp_card<<endl;
             cout<<"(Greedy_aleatorizado) S: "<<S<<"\n\nCardinalidad Greedy_a + LocalSearch: "<<MAYOR_CARDINALIDAD_GLOBAL<<endl;
             cout<<"(Greedy_a + LocalSearch) mejor_s: "<<MEJOR_S<<endl<<endl;
-            cout<<"Tiempo ejecucion: "<<(double(t1-t0)/CLOCKS_PER_SEC)<<"\nTiempo total: "<<time<<endl<<endl;
+            cout<<"Tiempo ejecucion: "<<(double(t1-t0)/CLOCKS_PER_SEC)<<"\nTiempo transcurrido: "<<time<<endl<<endl;
             graspSols.push_back(make_pair(MEJOR_S,make_pair(MAYOR_CARDINALIDAD_GLOBAL,make_pair(iteracion,make_pair((double(t1-t0)/CLOCKS_PER_SEC),time)))));
             guardarSol = false;
         }
@@ -364,11 +364,11 @@ void GRASP(string dir, vector<string> & vec_strings, int t, float th, float nive
     cout<<"  Resultado Final GRASP  "<<endl; 
     cout<<"Cardinalidad de P^S: "<<MAYOR_CARDINALIDAD_GLOBAL<<endl;
     cout<<"S: "<<MEJOR_S<<endl;
-    cout<<"Tiempo de respuesta: "<<time<<" [seconds]"<<endl<<endl;
+    cout<<"Tiempo transcurrido: "<<time<<" [seconds]"<<endl<<endl;
     //GURADAR RESULTADOS EN TXT
-    resultados<<"*****Resultado Final GRASP*****\nCardinalidad P^S: "<<MAYOR_CARDINALIDAD_GLOBAL<<"\nTiempo de respuesta: "<<to_string(time)<<"[s]\nS: "<<MEJOR_S<<"\n\n**Resultados**"<<endl;
+    resultados<<"*****Resultado Final GRASP*****\nCardinalidad P^S: "<<MAYOR_CARDINALIDAD_GLOBAL<<"\nTiempo transcurrido: "<<to_string(time)<<"[s]\nS: "<<MEJOR_S<<"\n\n**Resultados**"<<endl;
     for(vector<pair<string,pair<int,pair<int,pair<double,double>>>>>::iterator it = graspSols.begin(); it!=graspSols.end(); ++it){
-        resultados<<"Iteración: "<<it->second.second.first<<"\nCardinalidad: "<<it->second.first<<"\nTiempo ejecucion: "<<it->second.second.second.first<<"[s]\nTiempo total: "<<it->second.second.second.second<<"[s]\nS: "<<it->first<<endl<<endl;
+        resultados<<"Iteración: "<<it->second.second.first<<"\nCardinalidad: "<<it->second.first<<"\nTiempo ejecucion: "<<it->second.second.second.first<<"[s]\nTiempo transcurrido: "<<it->second.second.second.second<<"[s]\nS: "<<it->first<<endl<<endl;
     }
     resultados.close();
     
