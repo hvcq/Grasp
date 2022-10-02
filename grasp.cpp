@@ -228,9 +228,22 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
 las cuales seran el vecindario h realizar cambios en ellos*/
 
 //MAYOR_CARDINALIDAD_ITERACION es global por lo que tenemos la cardinalidad que se tenia de greedy aleatorizado
-string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_strings, vector<columna> vec_columnas, float porcentaje_vecindario){
+string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_strings, vector<columna> vec_columnas, vector<int> vec_t_strings, float porcentaje_vecindario){
     int size_vecindario =  m*porcentaje_vecindario;
     vector<char> posibilidades {'A','G','C','T'};
+    
+    // Dónde es true significa que el caracter es distinto al de la solucion y false que son iguales
+    bool matriz_caracteres[n][m];
+    for(int i = 0; i < n; ++i){
+        for(int j = 0 ; j < m; ++j){
+            if(vec_strings.at(i).at(j) != S.at(j))
+                matriz_caracteres[i][j] = true;
+            else
+                matriz_caracteres[i][j] = false;
+        }
+    }
+
+    vector<int> vec_t_strings_aux = vec_t_strings;
     int cardinalidad_aux = 0;
     string S_aux;
     string mejor_S = S;
@@ -241,14 +254,42 @@ string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_stri
                 cardinalidad_aux = 0;
                 S_aux.at(vec_columnas.at(i).posicion) = posibilidades.at(j); //vec_columnas.at(i).posicion es la posicion de la peor columna
                 for(int k = 0; k < n; ++k){
-                    if(calcula_threshold_string(S_aux,vec_strings.at(k)) >= threshold)
+                    if(S_aux.at(vec_columnas.at(i).posicion) != vec_strings.at(k).at(vec_columnas.at(i).posicion)){
+                        if(!matriz_caracteres[k][vec_columnas.at(i).posicion]){
+                            matriz_caracteres[k][vec_columnas.at(i).posicion] = true;
+                            ++vec_t_strings_aux.at(k);
+                        }
+                    }else{
+                        if(matriz_caracteres[k][vec_columnas.at(i).posicion]){
+                            matriz_caracteres[k][vec_columnas.at(i).posicion] = false;
+                            --vec_t_strings_aux.at(k);
+                        }
+                    }
+                    if(vec_t_strings_aux.at(k) >= threshold)
                         ++cardinalidad_aux;
                 }
                 if(cardinalidad_aux > MAYOR_CARDINALIDAD_ITERACION){
                     MAYOR_CARDINALIDAD_ITERACION = cardinalidad_aux;
                     mejor_S = S_aux;
                 }
+                vec_t_strings_aux.clear();
+                vec_t_strings_aux = vec_t_strings;
             }
+            cardinalidad_aux = 0;
+            for(int k = 0; k < n; ++k){
+                if(S_aux.at(vec_columnas.at(i).posicion) != vec_strings.at(k).at(vec_columnas.at(i).posicion)){
+                    if(!matriz_caracteres[k][vec_columnas.at(i).posicion]){
+                        matriz_caracteres[k][vec_columnas.at(i).posicion] = true;
+                        ++vec_t_strings_aux.at(k);
+                    }
+                }else{
+                    if(matriz_caracteres[k][vec_columnas.at(i).posicion]){
+                        matriz_caracteres[k][vec_columnas.at(i).posicion] = false;
+                        --vec_t_strings_aux.at(k);
+                    }
+                }
+            }
+            vec_t_strings = vec_t_strings_aux;
         }
         S = mejor_S;
     }
