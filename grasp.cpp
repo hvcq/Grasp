@@ -300,7 +300,7 @@ string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_stri
             S = mejor_S_aux;
         }
     }
-    return mejor_S_aux_aux;
+    return mejor_S_aux;
 }
 
 void GRASP(string dir, vector<string> & vec_strings, int t, float th, float nivel_de_determinismo, float porcentaje_vecindario){
