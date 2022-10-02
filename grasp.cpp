@@ -114,7 +114,7 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
     ir fijando aquellos caracteres que maximizan la cardinalidad al superar la mayor distancia de
     hamming (t) actual.
     */
-    while(vec_columnas.size() > (m - threshold + 1)){
+    while(vec_columnas.size() > (m - threshold)){
         S_aux = S;
         posicion_columna_a_asignar = columna_a_asignar(nivel_de_determinismo, vec_columnas.size());
         if(!eleccion_determinista){
@@ -163,7 +163,6 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
     }
     int mayor_cardinalidad = -1;
     int cardinalidad_aux;
-    
     /*
     Aqui se revisan las columnas restantes, la heuristica utilizada es para el caso no determinista, 
     ir fijando aquellos caracteres que maximizan la cardinalidad al superar o empatar el threshold actual
@@ -211,7 +210,6 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
         vec_t_strings = vec_t_strings_aux;
         vec_columnas.erase(vec_columnas.begin()+posicion_columna_a_asignar);
     }
-
     /*Si con thershold caracteres ya se abarca todo el conjunto omega, se rellena con 'A' las columnas sobrantes*/
     if(mayor_cardinalidad == n)
         for(int i = 0; i < m; ++i)
@@ -228,10 +226,11 @@ string greedy_aleatorizado(int n, int m, float th, vector<string> vec_strings, v
 las cuales seran el vecindario h realizar cambios en ellos*/
 
 //MAYOR_CARDINALIDAD_ITERACION es global por lo que tenemos la cardinalidad que se tenia de greedy aleatorizado
+
 string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_strings, vector<columna> vec_columnas, vector<int> vec_t_strings, float porcentaje_vecindario){
     int size_vecindario =  m*porcentaje_vecindario;
     vector<char> posibilidades {'A','G','C','T'};
-    
+
     // Dónde es true significa que el caracter es distinto al de la solucion y false que son iguales
     bool matriz_caracteres[n][m];
     for(int i = 0; i < n; ++i){
@@ -245,23 +244,23 @@ string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_stri
 
     vector<int> vec_t_strings_aux = vec_t_strings;
     int cardinalidad_aux = 0;
-    string S_aux;
-    string mejor_S = S;
+    string S_aux = S;
+    string mejor_S_aux = S;
+    bool encontre_mejor_cardinalidad = false;
+    int posicion_columna_a_asignar = m - 1;
     for(int ii = m - 1; ii >= m - size_vecindario; --ii){
         for(int i = m - 1; i >= m - size_vecindario; --i){
-            S_aux = S;
+            S_aux = S;    
             for(int j = 0; j < 4 ; ++j){
                 cardinalidad_aux = 0;
-                S_aux.at(vec_columnas.at(i).posicion) = posibilidades.at(j); //vec_columnas.at(i).posicion es la posicion de la peor columna
+                S_aux.at(vec_columnas.at(i).posicion) = posibilidades.at(j);
                 for(int k = 0; k < n; ++k){
                     if(S_aux.at(vec_columnas.at(i).posicion) != vec_strings.at(k).at(vec_columnas.at(i).posicion)){
                         if(!matriz_caracteres[k][vec_columnas.at(i).posicion]){
-                            matriz_caracteres[k][vec_columnas.at(i).posicion] = true;
                             ++vec_t_strings_aux.at(k);
                         }
                     }else{
                         if(matriz_caracteres[k][vec_columnas.at(i).posicion]){
-                            matriz_caracteres[k][vec_columnas.at(i).posicion] = false;
                             --vec_t_strings_aux.at(k);
                         }
                     }
@@ -270,30 +269,34 @@ string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_stri
                 }
                 if(cardinalidad_aux > MAYOR_CARDINALIDAD_ITERACION){
                     MAYOR_CARDINALIDAD_ITERACION = cardinalidad_aux;
-                    mejor_S = S_aux;
+                    mejor_S_aux = S_aux;
+                    encontre_mejor_cardinalidad = true;
+                    posicion_columna_a_asignar = i;
                 }
-                vec_t_strings_aux.clear();
                 vec_t_strings_aux = vec_t_strings;
-            }
-            cardinalidad_aux = 0;
+            }  
+        }
+
+        if(encontre_mejor_cardinalidad){
             for(int k = 0; k < n; ++k){
-                if(S_aux.at(vec_columnas.at(i).posicion) != vec_strings.at(k).at(vec_columnas.at(i).posicion)){
-                    if(!matriz_caracteres[k][vec_columnas.at(i).posicion]){
-                        matriz_caracteres[k][vec_columnas.at(i).posicion] = true;
+                if(mejor_S_aux.at(vec_columnas.at(posicion_columna_a_asignar).posicion) != vec_strings.at(k).at(vec_columnas.at(posicion_columna_a_asignar).posicion)){
+                    if(!matriz_caracteres[k][vec_columnas.at(posicion_columna_a_asignar).posicion]){
+                        matriz_caracteres[k][vec_columnas.at(posicion_columna_a_asignar).posicion] = true;
                         ++vec_t_strings_aux.at(k);
                     }
                 }else{
-                    if(matriz_caracteres[k][vec_columnas.at(i).posicion]){
-                        matriz_caracteres[k][vec_columnas.at(i).posicion] = false;
+                    if(matriz_caracteres[k][vec_columnas.at(posicion_columna_a_asignar).posicion]){
+                        matriz_caracteres[k][vec_columnas.at(posicion_columna_a_asignar).posicion] = false;
                         --vec_t_strings_aux.at(k);
                     }
                 }
             }
             vec_t_strings = vec_t_strings_aux;
+            encontre_mejor_cardinalidad = false;
+            S = mejor_S_aux;
         }
-        S = mejor_S;
     }
-    return mejor_S;
+    return mejor_S_aux;
 }
 
 void GRASP(vector<string> & vec_strings, int t, float th, float nivel_de_determinismo, float porcentaje_vecindario){
@@ -321,8 +324,9 @@ void GRASP(vector<string> & vec_strings, int t, float th, float nivel_de_determi
         //Aqui comienza a medir el tiempo
         t0 = clock();
         S = greedy_aleatorizado(n, m, th, vec_strings, vec_columnas, vec_t_strings, nivel_de_determinismo);
-        cout<<"(greedy_aleatorizado) S: "<<S<<endl;
+        cout<<"--------------"<<endl;
         cout<<"cardinalidad greedy_a: "<<MAYOR_CARDINALIDAD_ITERACION<<endl;
+        cout<<"solucion greedy_a S: "<<S<<endl;
         new_S = LocalSearch(n, m, th*m , S, vec_strings, vec_columnas, vec_t_strings, porcentaje_vecindario);
         cout<<"cardinalidad greedy_a + localSearch: "<<MAYOR_CARDINALIDAD_ITERACION<<endl;
         if(MAYOR_CARDINALIDAD_ITERACION > MAYOR_CARDINALIDAD_GLOBAL){
@@ -334,7 +338,7 @@ void GRASP(vector<string> & vec_strings, int t, float th, float nivel_de_determi
         time += (double(t1-t0)/CLOCKS_PER_SEC);
     
         //cout<<"Resultado iteracion "<<iteracion<<endl;
-        cout<<"(greedy_a + localSearch) S_aux: "<<new_S<<endl;
+        cout<<"(greedy_a + localSearch) new_S: "<<new_S<<endl;
         //cout<<"Cardinalidad de P^S: "<<MAYOR_CARDINALIDAD_ITERACION<<endl;
         //cout<<"Tiempo de respuesta: "<<time<<" [seconds]"<<endl<<endl;
         ++iteracion;
