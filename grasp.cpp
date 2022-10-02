@@ -231,7 +231,7 @@ las cuales seran el vecindario h realizar cambios en ellos*/
 string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_strings, vector<columna> vec_columnas, vector<int> vec_t_strings, float porcentaje_vecindario){
     int size_vecindario =  m*porcentaje_vecindario;
     vector<char> posibilidades {'A','G','C','T'};
-    
+
     // Dónde es true significa que el caracter es distinto al de la solucion y false que son iguales
     bool matriz_caracteres[n][m];
     for(int i = 0; i < n; ++i){
@@ -245,23 +245,23 @@ string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_stri
 
     vector<int> vec_t_strings_aux = vec_t_strings;
     int cardinalidad_aux = 0;
-    string S_aux;
-    string mejor_S = S;
+    string S_aux = S;
+    string mejor_S_aux = S;
+    bool encontre_mejor_cardinalidad = false;
+    int posicion_columna_a_asignar = m - 1;
     for(int ii = m - 1; ii >= m - size_vecindario; --ii){
         for(int i = m - 1; i >= m - size_vecindario; --i){
-            S_aux = S;
+            S_aux = S;    
             for(int j = 0; j < 4 ; ++j){
                 cardinalidad_aux = 0;
-                S_aux.at(vec_columnas.at(i).posicion) = posibilidades.at(j); //vec_columnas.at(i).posicion es la posicion de la peor columna
+                S_aux.at(vec_columnas.at(i).posicion) = posibilidades.at(j);
                 for(int k = 0; k < n; ++k){
                     if(S_aux.at(vec_columnas.at(i).posicion) != vec_strings.at(k).at(vec_columnas.at(i).posicion)){
                         if(!matriz_caracteres[k][vec_columnas.at(i).posicion]){
-                            matriz_caracteres[k][vec_columnas.at(i).posicion] = true;
                             ++vec_t_strings_aux.at(k);
                         }
                     }else{
                         if(matriz_caracteres[k][vec_columnas.at(i).posicion]){
-                            matriz_caracteres[k][vec_columnas.at(i).posicion] = false;
                             --vec_t_strings_aux.at(k);
                         }
                     }
@@ -269,31 +269,38 @@ string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_stri
                         ++cardinalidad_aux;
                 }
                 if(cardinalidad_aux > MAYOR_CARDINALIDAD_ITERACION){
+                    //cout<<"cardinalidad_aux ["<<vec_columnas.at(i).posicion<<"]"<<"("<<j<<"): "<<cardinalidad_aux<<endl;
                     MAYOR_CARDINALIDAD_ITERACION = cardinalidad_aux;
-                    mejor_S = S_aux;
+                    mejor_S_aux = S_aux;
+                    //cout<<"S_aux iteracion("<<i<<"): "<<S_aux<<endl;
+                    encontre_mejor_cardinalidad = true;
+                    posicion_columna_a_asignar = i;
                 }
-                vec_t_strings_aux.clear();
                 vec_t_strings_aux = vec_t_strings;
-            }
-            cardinalidad_aux = 0;
+            }  
+        }
+
+        if(encontre_mejor_cardinalidad){
             for(int k = 0; k < n; ++k){
-                if(S_aux.at(vec_columnas.at(i).posicion) != vec_strings.at(k).at(vec_columnas.at(i).posicion)){
-                    if(!matriz_caracteres[k][vec_columnas.at(i).posicion]){
-                        matriz_caracteres[k][vec_columnas.at(i).posicion] = true;
+                if(mejor_S_aux.at(vec_columnas.at(posicion_columna_a_asignar).posicion) != vec_strings.at(k).at(vec_columnas.at(posicion_columna_a_asignar).posicion)){
+                    if(!matriz_caracteres[k][vec_columnas.at(posicion_columna_a_asignar).posicion]){
+                        matriz_caracteres[k][vec_columnas.at(posicion_columna_a_asignar).posicion] = true;
                         ++vec_t_strings_aux.at(k);
                     }
                 }else{
-                    if(matriz_caracteres[k][vec_columnas.at(i).posicion]){
-                        matriz_caracteres[k][vec_columnas.at(i).posicion] = false;
+                    if(matriz_caracteres[k][vec_columnas.at(posicion_columna_a_asignar).posicion]){
+                        matriz_caracteres[k][vec_columnas.at(posicion_columna_a_asignar).posicion] = false;
                         --vec_t_strings_aux.at(k);
                     }
                 }
             }
+            //cout<<"(en el if) S_aux ["<<vec_columnas.at(posicion_columna_a_asignar).posicion<<"]: "<<mejor_S_aux<<endl<<endl;
             vec_t_strings = vec_t_strings_aux;
+            encontre_mejor_cardinalidad = false;
+            S = mejor_S_aux;
         }
-        S = mejor_S;
     }
-    return mejor_S;
+    return mejor_S_aux;
 }
 
 void GRASP(string dir, vector<string> & vec_strings, int t, float th, float nivel_de_determinismo, float porcentaje_vecindario){
@@ -345,7 +352,7 @@ void GRASP(string dir, vector<string> & vec_strings, int t, float th, float nive
         time += (double(t1-t0)/CLOCKS_PER_SEC);
         //GUARDA LA MEJOR SOLUCION ENCONTRADA, CARDINALIDADES Y TIEMPO DE EJECUCION
         if(guardarSol){
-            cout<<"Iteración: "<<iteracion<<"\nCardinalidad Greedy_a: "<<temp_card<<endl;
+            cout<<"*** Iteración "<<iteracion<<" ***\nCardinalidad Greedy_a: "<<temp_card<<endl;
             cout<<"(Greedy_aleatorizado) S: "<<S<<"\n\nCardinalidad Greedy_a + LocalSearch: "<<MAYOR_CARDINALIDAD_GLOBAL<<endl;
             cout<<"(Greedy_a + LocalSearch) mejor_s: "<<MEJOR_S<<endl<<endl;
             cout<<"Tiempo ejecucion: "<<(double(t1-t0)/CLOCKS_PER_SEC)<<"\nTiempo transcurrido: "<<time<<endl<<endl;
@@ -368,7 +375,7 @@ void GRASP(string dir, vector<string> & vec_strings, int t, float th, float nive
     //GURADAR RESULTADOS EN TXT
     resultados<<"*****Resultado Final GRASP*****\nCardinalidad P^S: "<<MAYOR_CARDINALIDAD_GLOBAL<<"\nTiempo transcurrido: "<<to_string(time)<<"[s]\nS: "<<MEJOR_S<<"\n\n**Resultados**"<<endl;
     for(vector<pair<string,pair<int,pair<int,pair<double,double>>>>>::iterator it = graspSols.begin(); it!=graspSols.end(); ++it){
-        resultados<<"Iteración: "<<it->second.second.first<<"\nCardinalidad: "<<it->second.first<<"\nTiempo ejecucion: "<<it->second.second.second.first<<"[s]\nTiempo transcurrido: "<<it->second.second.second.second<<"[s]\nS: "<<it->first<<endl<<endl;
+        resultados<<"*Iteración: "<<it->second.second.first<<"\nCardinalidad: "<<it->second.first<<"\nTiempo ejecucion: "<<it->second.second.second.first<<"[s]\nTiempo transcurrido: "<<it->second.second.second.second<<"[s]\nS: "<<it->first<<endl<<endl;
     }
     resultados.close();
     
