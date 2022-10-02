@@ -333,7 +333,7 @@ void GRASP(string dir, vector<string> & vec_strings, int t, float th, float nive
         cout<<"cardinalidad greedy_a: "<<MAYOR_CARDINALIDAD_ITERACION<<endl;
         cout<<"(greedy_aleatorizado) S: "<<S<<endl;
         */
-        new_S = LocalSearch(n, m, th*m , S, vec_strings, vec_columnas, porcentaje_vecindario);
+        new_S = LocalSearch(n, m, th*m , S, vec_strings, vec_columnas, vec_t_strings, porcentaje_vecindario);
         //cout<<"cardinalidad greedy_a + localSearch: "<<MAYOR_CARDINALIDAD_ITERACION<<endl;
         if(MAYOR_CARDINALIDAD_ITERACION > MAYOR_CARDINALIDAD_GLOBAL){
             MAYOR_CARDINALIDAD_GLOBAL = MAYOR_CARDINALIDAD_ITERACION;
