@@ -255,11 +255,15 @@ string LocalSearch(int n,int m, int threshold, string S, vector<string> vec_stri
     return mejor_S;
 }
 
-void GRASP(vector<string> & vec_strings, int t, float th, float nivel_de_determinismo, float porcentaje_vecindario){
+void GRASP(string dir, vector<string> & vec_strings, int t, float th, float nivel_de_determinismo, float porcentaje_vecindario){
     int n = vec_strings.size();
     int m = vec_strings.at(0).size();
     vector<columna> vec_columnas;
-    
+
+    //directorio soluciones y vector soluciones a escribir
+    vector<pair<string,pair<int,pair<int,pair<double,double>>>>> graspSols;
+    ofstream resultados;
+    resultados.open(dir,ofstream::out | ofstream::app);
     /*Inicializa el vector con las columnas*/
     setup_columnas(n, m, vec_strings, vec_columnas);
     
@@ -274,35 +278,58 @@ void GRASP(vector<string> & vec_strings, int t, float th, float nivel_de_determi
     double time = 0;
     unsigned t0, t1;
     int iteracion = 0;
+    int temp_card=0;
+    bool guardarSol = false;
     MAYOR_CARDINALIDAD_GLOBAL = -1;
+    //while(iteracion<1){
     while(time < t){
         fill(vec_t_strings.begin(), vec_t_strings.end(), 0); // inicia el t de cada string en 0
         //Aqui comienza a medir el tiempo
         t0 = clock();
         S = greedy_aleatorizado(n, m, th, vec_strings, vec_columnas, vec_t_strings, nivel_de_determinismo);
-        cout<<"(greedy_aleatorizado) S: "<<S<<endl;
+        temp_card = MAYOR_CARDINALIDAD_ITERACION;
+        /*
         cout<<"cardinalidad greedy_a: "<<MAYOR_CARDINALIDAD_ITERACION<<endl;
+        cout<<"(greedy_aleatorizado) S: "<<S<<endl;
+        */
         new_S = LocalSearch(n, m, th*m , S, vec_strings, vec_columnas, porcentaje_vecindario);
-        cout<<"cardinalidad greedy_a + localSearch: "<<MAYOR_CARDINALIDAD_ITERACION<<endl;
+        //cout<<"cardinalidad greedy_a + localSearch: "<<MAYOR_CARDINALIDAD_ITERACION<<endl;
         if(MAYOR_CARDINALIDAD_ITERACION > MAYOR_CARDINALIDAD_GLOBAL){
             MAYOR_CARDINALIDAD_GLOBAL = MAYOR_CARDINALIDAD_ITERACION;
             MEJOR_S = new_S;
+            guardarSol=true;
         }
         //Aqui termina de medir el tiempo
         t1 = clock();
         time += (double(t1-t0)/CLOCKS_PER_SEC);
-    
-        //cout<<"Resultado iteracion "<<iteracion<<endl;
-        cout<<"(greedy_a + localSearch) S_aux: "<<new_S<<endl;
-        //cout<<"Cardinalidad de P^S: "<<MAYOR_CARDINALIDAD_ITERACION<<endl;
-        //cout<<"Tiempo de respuesta: "<<time<<" [seconds]"<<endl<<endl;
+        //GUARDA LA MEJOR SOLUCION ENCONTRADA, CARDINALIDADES Y TIEMPO DE EJECUCION
+        if(guardarSol){
+            cout<<"Iteración: "<<iteracion<<"\nCardinalidad Greedy_a: "<<temp_card<<endl;
+            cout<<"(Greedy_aleatorizado) S: "<<S<<"\n\nCardinalidad Greedy_a + LocalSearch: "<<MAYOR_CARDINALIDAD_GLOBAL<<endl;
+            cout<<"(Greedy_a + LocalSearch) mejor_s: "<<MEJOR_S<<endl<<endl;
+            cout<<"Tiempo ejecucion: "<<(double(t1-t0)/CLOCKS_PER_SEC)<<"\nTiempo total: "<<time<<endl<<endl;
+            graspSols.push_back(make_pair(MEJOR_S,make_pair(MAYOR_CARDINALIDAD_GLOBAL,make_pair(iteracion,make_pair((double(t1-t0)/CLOCKS_PER_SEC),time)))));
+            guardarSol = false;
+        }
+        /*
+        cout<<"Resultado iteracion "<<iteracion<<endl;
+        cout<<"(greedy_a + localSearch) S_aux: "<<new_S<<endl<<endl;
+        cout<<"Cardinalidad de P^S: "<<MAYOR_CARDINALIDAD_ITERACION<<endl;
+        cout<<"Tiempo de respuesta: "<<time<<" [seconds]"<<endl<<endl;
+        */
         ++iteracion;
     }  
     cout<<"_________________________"<<endl;
     cout<<"  Resultado Final GRASP  "<<endl; 
-    cout<<"S: "<<MEJOR_S<<endl;
     cout<<"Cardinalidad de P^S: "<<MAYOR_CARDINALIDAD_GLOBAL<<endl;
+    cout<<"S: "<<MEJOR_S<<endl;
     cout<<"Tiempo de respuesta: "<<time<<" [seconds]"<<endl<<endl;
+    //GURADAR RESULTADOS EN TXT
+    resultados<<"*****Resultado Final GRASP*****\nCardinalidad P^S: "<<MAYOR_CARDINALIDAD_GLOBAL<<"\nTiempo de respuesta: "<<to_string(time)<<"[s]\nS: "<<MEJOR_S<<"\n\n**Resultados**"<<endl;
+    for(vector<pair<string,pair<int,pair<int,pair<double,double>>>>>::iterator it = graspSols.begin(); it!=graspSols.end(); ++it){
+        resultados<<"Iteración: "<<it->second.second.first<<"\nCardinalidad: "<<it->second.first<<"\nTiempo ejecucion: "<<it->second.second.second.first<<"[s]\nTiempo total: "<<it->second.second.second.second<<"[s]\nS: "<<it->first<<endl<<endl;
+    }
+    resultados.close();
     
 }
 
@@ -313,32 +340,68 @@ int main(int argc, char *argv[]){
         cout<<endl<<"ERROR: No se encuentran todos los argumentos necesarios"<<endl;
         throw;
     }
-    parsear_entrada(argv[2], vec_strings);
-    GRASP(vec_strings,stoi(argv[4]),stof(argv[6]),stof(argv[8]),stof(argv[10]));
-    /*tiempos_txt.open("resultados_GP_0.85.txt");
-    string archivo;
-    for(int i = 1; i <= 10; ++i){
-        archivo = "100-300-0";
-        if(i<10){
-            archivo.push_back('0');
-            archivo.push_back(to_string(i).c_str()[0]);
-        }else{
-            archivo.push_back('1');
-            archivo.push_back('0');
+    time_t now = time(0);
+    string dt = ctime(&now);
+    for(string::iterator it = dt.begin(); it != dt.end()+1; ++it) {
+        if(*it == ' ') {
+            *it = '-';
         }
-        archivo.push_back('.');
-        archivo.push_back('t');
-        archivo.push_back('x');
-        archivo.push_back('t');
-
-        parsear_entrada(archivo, vec_strings);
-        tiempos_txt<<"------ instancia "<<archivo<<" ------"<<endl;
-        tiempos_txt<<"th: "<<argv[4]<<endl;
-        tiempos_txt<<"determinismo: "<<argv[6]<<endl;
-        greedy_aleatorizado(vec_strings.size(), vec_strings.at(0).size(), stof(argv[4]), vec_strings, stof(argv[6]));
-        tiempos_txt<<endl;
-        vec_strings.clear();
+        if(*it == '\n'){
+            *it = '_';
+        }
     }
-    tiempos_txt.close();*/
+    //params del directorio de resultados
+    string config = argv[2];
+    string t = argv[4];
+    string th = argv[6]; 
+    string d = argv[8];
+    string v =  argv[10];
+    if(config == "all"){
+        //TODAS LAS INSTANCIAS
+        string nomInstance;
+        string instancia;
+        string instance;
+        for(int j=1; j<=6; j++){
+            switch (j){
+                case 1:
+                    nomInstance = "100-300-0";
+                    break;
+                case 2:
+                    nomInstance = "100-600-0";
+                    break;
+                case 3:
+                    nomInstance = "100-800-0";
+                    break;
+                case 4:
+                    nomInstance = "200-300-0";
+                    break;
+                case 5:
+                    nomInstance = "200-600-0";
+                    break;
+                case 6:
+                    nomInstance = "200-800-0";
+                    break;
+            }
+            for(int i=1; i<=10;i++){
+                if(i<10){
+                    instancia = nomInstance+'0'+to_string(i)+".txt";
+                    instance = nomInstance+'0'+to_string(i);
+                }else{
+                    instancia = nomInstance+to_string(i)+".txt";
+                    instance = nomInstance+to_string(i);
+                }
+                parsear_entrada(instancia, vec_strings);
+                string dir = "resultados/"+dt+"i-"+instance+"_t"+t+"_th"+th+"_d"+d+"_v"+v+".txt";
+                cout<<"***** "<<instance<<" *****\n"<<endl;
+                GRASP(dir,vec_strings,stoi(argv[4]),stof(argv[6]),stof(argv[8]),stof(argv[10]));
+                vec_strings.clear();
+            }
+        }
+    }else{
+        parsear_entrada(argv[2], vec_strings);
+        string instance = strtok(argv[2],".");
+        string dir = "resultados/"+dt+"i-"+instance+"_t"+t+"_th"+th+"_d"+d+"_v"+v+".txt";
+        GRASP(dir,vec_strings,stoi(argv[4]),stof(argv[6]),stof(argv[8]),stof(argv[10]));
+    }
     return 0;
 }
