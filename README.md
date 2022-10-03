@@ -14,7 +14,7 @@ Para ejecutar el programa hay dos formas, la primera consiste de esta linea de c
   * -t tiempoEnSegundosEntero
   * -th thresholdFlotante
   * -d nivelDeterminismoFlotante
-  * -v porcentajeVecindarioLocalSearch
+  * -v porcentajeVecindadLocalSearch
     * este corresponde a un porcentaje de las peores columnas a analizar en LocalSearch
 
 Ahora, la segunda forma de ejecutar es la siguiente
