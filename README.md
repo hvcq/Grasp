@@ -1,23 +1,23 @@
 # Grasp
 Para el correcto funcionamiento del código se le entregará lo siguiente: \
-    * Carpeta "instancias" que contiene todo el dataset
-    * Carpeta "resultados" la que guardará los resultados entregados por el programa
-    * Archivos grasp.cpp, input.h y ejecutable grasp.
+* Carpeta "instancias" que contiene todo el dataset
+* Carpeta "resultados" la que guardará los resultados entregados por el programa
+* Archivos grasp.cpp, input.h y ejecutable grasp.
 
 Para compilar basta con ejecutar\
-    * g++ grasp.cpp -o grasp
+* g++ grasp.cpp -o grasp
 
 Para ejecutar el programa hay dos formas, la primera consiste de esta linea de comando\
-    * ./grasp -i 100-300-001.txt -t 1 -th 0.8 -d 0.9 -v 0.07\
-    * con los parametros
-        * -i nombreInstancia.txt
-        * -t tiempoEnSegundosEntero
-        * -th thresholdFlotante
-        * -d nivelDeterminismoFlotante
-        * -v porcentajeVecindarioLocalSearch\
-            * este corresponde a un porcentaje de las peores columnas a analizar en LocalSearch\
+* ./grasp -i 100-300-001.txt -t 1 -th 0.8 -d 0.9 -v 0.07\
+* con los parametros
+* -i nombreInstancia.txt
+* -t tiempoEnSegundosEntero
+* -th thresholdFlotante
+* -d nivelDeterminismoFlotante
+* -v porcentajeVecindarioLocalSearch\
+* este corresponde a un porcentaje de las peores columnas a analizar en LocalSearch\
 Ahora, la segunda forma de ejecutar es la siguiente\
-    * ./grasp -i all -t 1 -th 0.8 -d 0.9 -v 0.07
+* ./grasp -i all -t 1 -th 0.8 -d 0.9 -v 0.07
 
 -se ha implementado el comando all, que le indica al programa que se ejecute para las 10 instancias de las variaciones del dataset.\
 \
